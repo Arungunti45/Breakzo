@@ -43,7 +43,7 @@ export default function LoginOTP() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500">
       <div className="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4">
         <div className="text-center mb-8">
-          <img src="/breakzo.png" alt="Breakzo" className="h-20 w-auto mx-auto object-contain drop-shadow-md" />
+          <img src="/breakzo.png" alt="Breakzo Logo" className="h-20 w-auto mx-auto object-contain rounded-2xl drop-shadow-md" />
           <p className="text-gray-500 mt-2">Login with your phone number</p>
         </div>
 

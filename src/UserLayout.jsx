@@ -71,7 +71,7 @@ function UserLayout() {
             {/* Logo */}
 
             <div className="flex-shrink-0 flex items-center">
-              <img src="/food_img.jpeg" alt="BZ Logo" className="h-12 w-auto drop-shadow-md rounded-xl" />
+              <img src="/breakzo.png" alt="Breakzo Logo" className="h-12 w-auto drop-shadow-md rounded-xl bg-white p-1" />
             </div>
 
 

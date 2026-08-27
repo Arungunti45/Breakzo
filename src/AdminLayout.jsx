@@ -81,7 +81,7 @@ function AdminLayout() {
       }`}>
         <div className="h-16 flex items-center justify-between px-6 bg-slate-950 border-b border-slate-800">
           <div className="flex items-center">
-            <img src="/food_img.jpeg" alt="BZ Logo" className="h-8 w-auto rounded bg-white p-1 mr-3" />
+            <img src="/breakzo.png" alt="Breakzo Logo" className="h-8 w-auto rounded bg-white p-1 mr-3" />
             <span className="text-white font-bold text-xl tracking-wide">Admin Portal</span>
           </div>
           <button className="md:hidden text-slate-400 hover:text-white" onClick={() => setIsSidebarOpen(false)}>
