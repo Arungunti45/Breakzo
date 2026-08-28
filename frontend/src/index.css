@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100;
+  }
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-kot, .print-kot * {
+    visibility: visible;
+  }
+  .print-kot {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm; /* Standard receipt printer width */
+    font-family: monospace;
+    font-size: 12px;
+    padding: 0;
+    margin: 0;
+    color: black !important;
+  }
+  .print-kot h1 {
+    font-size: 16px;
+    text-align: center;
+    border-bottom: 1px dashed black;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+  }
+  .print-kot .item-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .print-kot .total-row {
+    border-top: 1px dashed black;
+    margin-top: 10px;
+    padding-top: 5px;
+    font-weight: bold;
+  }
+}
