@@ -1,11 +1,16 @@
 import { useState } from 'react';
 import { useEffect } from 'react';
+import Pagination from './Pagination';
 
 function WalletAndLoyalty() {
   const [wallet, setWallet] = useState({ balance: 0.00 });
   const [loyalty, setLoyalty] = useState({ points: 0, current_streak: 0, highest_streak: 0 });
   const [transactions, setTransactions] = useState([]);
   const [amountToAdd, setAmountToAdd] = useState('');
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   useEffect(() => {
     fetchWalletData();
@@ -107,7 +112,7 @@ function WalletAndLoyalty() {
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         <h3 className="text-xl font-bold text-slate-800 mb-4">Recent Transactions</h3>
         <div className="space-y-4">
-          {transactions.map(tx => (
+          {transactions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map(tx => (
             <div key={tx.id} className="flex justify-between items-center p-3 hover:bg-slate-50 rounded-lg transition-colors border-b border-slate-100 last:border-0">
               <div className="flex items-center gap-4">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${tx.type === 'topup' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
@@ -127,6 +132,14 @@ function WalletAndLoyalty() {
             </div>
           ))}
         </div>
+        {transactions.length > itemsPerPage && (
+          <Pagination
+            itemsPerPage={itemsPerPage}
+            totalItems={transactions.length}
+            paginate={setCurrentPage}
+            currentPage={currentPage}
+          />
+        )}
       </div>
     </div>
   );

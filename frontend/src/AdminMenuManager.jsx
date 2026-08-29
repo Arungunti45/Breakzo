@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { Plus, Edit2, Trash2, X, Save, Package, Search } from 'lucide-react';
 import { io } from 'socket.io-client';
+import Pagination from './Pagination';
 
 const socket = io('http://localhost:8000');
 const API_BASE = 'http://localhost:8000';
@@ -36,6 +37,10 @@ function AdminMenuManager() {
   const [form, setForm] = useState({ ...emptyItem });
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     fetchItems();
@@ -71,6 +76,16 @@ function AdminMenuManager() {
                           (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesCategory && matchesSearch;
   });
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, searchQuery]);
+
+  // Get current page items
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -376,7 +391,7 @@ function AdminMenuManager() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filteredItems.length === 0 ? (
+              {currentItems.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="text-center py-8 text-gray-400">
                     <Package size={40} className="mx-auto mb-2 opacity-40" />
@@ -384,7 +399,7 @@ function AdminMenuManager() {
                   </td>
                 </tr>
               ) : (
-                filteredItems.map((item) => (
+                currentItems.map((item) => (
                   <tr key={item.id} className="hover:bg-gray-50 transition">
                     <td className="px-4 py-3">
                       <div>
@@ -431,6 +446,14 @@ function AdminMenuManager() {
             </tbody>
           </table>
         </div>
+        {filteredItems.length > itemsPerPage && (
+          <Pagination
+            itemsPerPage={itemsPerPage}
+            totalItems={filteredItems.length}
+            paginate={setCurrentPage}
+            currentPage={currentPage}
+          />
+        )}
       </div>
     </div>
   );

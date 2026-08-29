@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { Leaf, TrendingDown, AlertTriangle, Plus, BarChart3, RefreshCw } from 'lucide-react';
+import Pagination from './Pagination';
 
 const API_BASE = 'http://localhost:8000';
 
@@ -9,6 +10,10 @@ function AdminSupplierWaste() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ item_name: '', quantity_unsold: '', reason: 'overproduction' });
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   useEffect(() => {
     fetchAnalytics();
@@ -173,7 +178,7 @@ function AdminSupplierWaste() {
           <p className="text-gray-400 text-center py-4">No waste data yet. Start logging waste to see analytics.</p>
         ) : (
           <div className="space-y-3">
-            {analytics.overproduced_items.map((item, i) => (
+            {analytics.overproduced_items.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((item, i) => (
               <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
                 <div>
                   <p className="font-medium text-gray-900">{item.name}</p>
@@ -187,6 +192,14 @@ function AdminSupplierWaste() {
               </div>
             ))}
           </div>
+        )}
+        {analytics?.overproduced_items?.length > itemsPerPage && (
+          <Pagination
+            itemsPerPage={itemsPerPage}
+            totalItems={analytics.overproduced_items.length}
+            paginate={setCurrentPage}
+            currentPage={currentPage}
+          />
         )}
       </div>
     </div>

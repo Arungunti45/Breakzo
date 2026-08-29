@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { ShoppingBag, Star, Clock, Calendar, CheckCircle, Tag, Store } from 'lucide-react';
+import Pagination from './Pagination';
 
 export default function UserActivity() {
   const [activeTab, setActiveTab] = useState('orders'); // 'orders' or 'reviews'
   const [orders, setOrders] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Pagination state
+  const [currentPageOrders, setCurrentPageOrders] = useState(1);
+  const [currentPageReviews, setCurrentPageReviews] = useState(1);
+  const itemsPerPage = 5;
 
   const userId = localStorage.getItem('userId') || '1';
 
@@ -99,8 +105,9 @@ export default function UserActivity() {
               <p className="text-slate-500 mt-2">You haven't placed any orders. Time to grab a bite!</p>
             </div>
           ) : (
-            orders.map(order => (
-              <div key={order.order_id} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition">
+            <>
+              {orders.slice((currentPageOrders - 1) * itemsPerPage, currentPageOrders * itemsPerPage).map(order => (
+                <div key={order.order_id} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-4 mb-4 gap-4">
                   <div>
                     <h3 className="text-xl font-black text-slate-800 flex items-center gap-2">
@@ -147,9 +154,18 @@ export default function UserActivity() {
                   )}
                 </div>
               </div>
-            ))
-          )}
-        </div>
+            ))}
+            {orders.length > itemsPerPage && (
+              <Pagination
+                itemsPerPage={itemsPerPage}
+                totalItems={orders.length}
+                paginate={setCurrentPageOrders}
+                currentPage={currentPageOrders}
+              />
+            )}
+          </>
+        )}
+      </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {reviews.length === 0 ? (
@@ -159,8 +175,9 @@ export default function UserActivity() {
               <p className="text-slate-500 mt-2">You haven't left any reviews. Share your thoughts on items you eat!</p>
             </div>
           ) : (
-            reviews.map(review => (
-              <div key={review.id} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition flex flex-col">
+            <>
+              {reviews.slice((currentPageReviews - 1) * itemsPerPage, currentPageReviews * itemsPerPage).map(review => (
+                <div key={review.id} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition flex flex-col">
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="font-bold text-slate-800 text-lg">{review.item_name}</h3>
@@ -186,10 +203,21 @@ export default function UserActivity() {
                   </p>
                 </div>
               </div>
-            ))
-          )}
-        </div>
-      )}
-    </div>
+            ))}
+            {reviews.length > itemsPerPage && (
+              <div className="col-span-full">
+                <Pagination
+                  itemsPerPage={itemsPerPage}
+                  totalItems={reviews.length}
+                  paginate={setCurrentPageReviews}
+                  currentPage={currentPageReviews}
+                />
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    )}
+  </div>
   );
 }

@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { ShoppingCart, Plus, Minus, Trash2, CreditCard, Clock, Zap, Search, Info, X, Star, Wallet } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
+import Pagination from './Pagination';
 
 const socket = io('http://localhost:8000');
 
@@ -29,6 +30,10 @@ function Menu() {
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponError, setCouponError] = useState('');
   
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -72,6 +77,11 @@ function Menu() {
                           (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesCategory && matchesSearch;
   });
+
+  // Reset page on search or category change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, searchQuery]);
 
   const [activeItem, setActiveItem] = useState(null);
   
@@ -396,49 +406,59 @@ function Menu() {
             No items available in this category.
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {filteredItems.map(item => (
-              <div key={item.id} className="bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition flex flex-col overflow-hidden justify-between">
-                <div>
-                  <img src={getImageUrl(item)} alt={item.name} className="w-full h-48 object-cover bg-slate-50" />
-                  <div className="p-5">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                        {item.name}
-                        <button onClick={() => handleInfoClick(item)} className="text-slate-400 hover:text-blue-600 transition" title="View Info">
-                          <Info size={16} />
-                        </button>
-                      </h3>
-                      <span className="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded font-medium ml-2 text-right shrink-0">{item.category}</span>
-                    </div>
-                    <p className="text-sm text-slate-500 mb-0">{item.description}</p>
-                    
-                    {/* Dietary Badges */}
-                    <div className="flex gap-1 mt-2">
-                      {item.is_vegan && <span className="bg-green-100 text-green-700 text-[10px] px-1.5 py-0.5 rounded font-bold">VEGAN</span>}
-                      {item.is_vegetarian && !item.is_vegan && <span className="bg-emerald-100 text-emerald-700 text-[10px] px-1.5 py-0.5 rounded font-bold">VEG</span>}
-                      {!item.is_vegetarian && <span className="bg-red-100 text-red-700 text-[10px] px-1.5 py-0.5 rounded font-bold">NON-VEG</span>}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-5 pb-5 mt-auto pt-4 border-t border-slate-100 gap-3">
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {filteredItems.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map(item => (
+                <div key={item.id} className="bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition flex flex-col overflow-hidden justify-between">
                   <div>
-                    <p className="text-xl font-black text-blue-700">₹{Number(item.price).toFixed(2)}</p>
-                    <p className={`text-xs font-bold ${item.stock_quantity < 5 ? 'text-red-500' : 'text-slate-500'}`}>
-                      {item.stock_quantity > 0 ? `${item.stock_quantity} available` : 'Sold out'}
-                    </p>
+                    <img src={getImageUrl(item)} alt={item.name} className="w-full h-48 object-cover bg-slate-50" />
+                    <div className="p-5">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                          {item.name}
+                          <button onClick={() => handleInfoClick(item)} className="text-slate-400 hover:text-blue-600 transition" title="View Info">
+                            <Info size={16} />
+                          </button>
+                        </h3>
+                        <span className="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded font-medium ml-2 text-right shrink-0">{item.category}</span>
+                      </div>
+                      <p className="text-sm text-slate-500 mb-0">{item.description}</p>
+                      
+                      {/* Dietary Badges */}
+                      <div className="flex gap-1 mt-2">
+                        {item.is_vegan && <span className="bg-green-100 text-green-700 text-[10px] px-1.5 py-0.5 rounded font-bold">VEGAN</span>}
+                        {item.is_vegetarian && !item.is_vegan && <span className="bg-emerald-100 text-emerald-700 text-[10px] px-1.5 py-0.5 rounded font-bold">VEG</span>}
+                        {!item.is_vegetarian && <span className="bg-red-100 text-red-700 text-[10px] px-1.5 py-0.5 rounded font-bold">NON-VEG</span>}
+                      </div>
+                    </div>
                   </div>
-                  <button
-                    onClick={() => handleAddToCartClick(item)}
-                    disabled={item.stock_quantity < 1 || !isCanteenOpen}
-                    className={`w-full sm:w-auto justify-center px-4 py-2 rounded-lg font-bold transition flex items-center gap-2 ${(item.stock_quantity < 1 || !isCanteenOpen) ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm'}`}
-                  >
-                    {item.stock_quantity < 1 ? 'Out of Stock' : !isCanteenOpen ? 'Closed' : <><Plus size={18} /> Add</>}
-                  </button>
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-5 pb-5 mt-auto pt-4 border-t border-slate-100 gap-3">
+                    <div>
+                      <p className="text-xl font-black text-blue-700">₹{Number(item.price).toFixed(2)}</p>
+                      <p className={`text-xs font-bold ${item.stock_quantity < 5 ? 'text-red-500' : 'text-slate-500'}`}>
+                        {item.stock_quantity > 0 ? `${item.stock_quantity} available` : 'Sold out'}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => handleAddToCartClick(item)}
+                      disabled={item.stock_quantity < 1 || !isCanteenOpen}
+                      className={`w-full sm:w-auto justify-center px-4 py-2 rounded-lg font-bold transition flex items-center gap-2 ${(item.stock_quantity < 1 || !isCanteenOpen) ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm'}`}
+                    >
+                      {item.stock_quantity < 1 ? 'Out of Stock' : !isCanteenOpen ? 'Closed' : <><Plus size={18} /> Add</>}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+            {filteredItems.length > itemsPerPage && (
+              <Pagination
+                itemsPerPage={itemsPerPage}
+                totalItems={filteredItems.length}
+                paginate={setCurrentPage}
+                currentPage={currentPage}
+              />
+            )}
+          </>
         )}
       </div>
       {/* Shopping Cart Modal */}

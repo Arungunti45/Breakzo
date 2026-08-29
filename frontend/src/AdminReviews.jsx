@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { Star, MessageSquare } from 'lucide-react';
+import Pagination from './Pagination';
 
 export default function AdminReviews() {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
   useEffect(() => {
     fetchReviews();
@@ -47,9 +52,10 @@ export default function AdminReviews() {
           <p className="text-slate-500 mt-2">When students leave reviews on menu items, they will appear here.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {reviews.map(review => (
-            <div key={review.id} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col hover:shadow-md transition">
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {reviews.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map(review => (
+              <div key={review.id} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col hover:shadow-md transition">
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <h3 className="font-bold text-slate-800 text-lg">{review.item_name}</h3>
@@ -76,8 +82,17 @@ export default function AdminReviews() {
                 <span className="text-xs text-slate-500 font-medium">{review.mobile_number}</span>
               </div>
             </div>
-          ))}
-        </div>
+            ))}
+          </div>
+          {reviews.length > itemsPerPage && (
+            <Pagination
+              itemsPerPage={itemsPerPage}
+              totalItems={reviews.length}
+              paginate={setCurrentPage}
+              currentPage={currentPage}
+            />
+          )}
+        </>
       )}
     </div>
   );

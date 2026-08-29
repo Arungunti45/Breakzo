@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { RefreshCw, CheckCircle, AlertCircle, DollarSign, User } from 'lucide-react';
+import Pagination from './Pagination';
 
 const API_BASE = 'http://localhost:8000';
 
@@ -8,6 +9,10 @@ function AdminRefunds() {
   const [refunds, setRefunds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(null);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   useEffect(() => {
     fetchRefunds();
@@ -79,7 +84,7 @@ function AdminRefunds() {
         </div>
       ) : (
         <div className="space-y-4">
-          {refunds.map((refund) => (
+          {refunds.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((refund) => (
             <div key={refund.order_id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
@@ -121,6 +126,14 @@ function AdminRefunds() {
               </div>
             </div>
           ))}
+          {refunds.length > itemsPerPage && (
+            <Pagination
+              itemsPerPage={itemsPerPage}
+              totalItems={refunds.length}
+              paginate={setCurrentPage}
+              currentPage={currentPage}
+            />
+          )}
         </div>
       )}
     </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { Tag, Gift, Trash2, PlusCircle } from 'lucide-react';
+import Pagination from './Pagination';
 
 function AdminOffersManager() {
   const [coupons, setCoupons] = useState([]);
@@ -9,6 +10,11 @@ function AdminOffersManager() {
   // Forms state
   const [couponForm, setCouponForm] = useState({ code: '', desc: '', discount: '' });
   const [offerForm, setOfferForm] = useState({ title: '', desc: '', discount: '', color: 'from-blue-500 to-indigo-500' });
+
+  // Pagination state
+  const [currentPageOffers, setCurrentPageOffers] = useState(1);
+  const [currentPageCoupons, setCurrentPageCoupons] = useState(1);
+  const itemsPerPage = 5;
 
   useEffect(() => {
     fetchCoupons();
@@ -150,7 +156,7 @@ function AdminOffersManager() {
 
           <div className="space-y-4">
             <h3 className="font-bold text-slate-700 dark:text-slate-300">Active Fest Offers</h3>
-            {festOffers.map(o => (
+            {festOffers.slice((currentPageOffers - 1) * itemsPerPage, currentPageOffers * itemsPerPage).map(o => (
               <div key={o.id} className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex justify-between items-center shadow-sm">
                 <div>
                   <h4 className="font-bold text-slate-800 dark:text-white">{o.title} <span className="text-xs bg-pink-100 text-pink-600 px-2 py-0.5 rounded-full ml-2">{o.discount}</span></h4>
@@ -162,6 +168,14 @@ function AdminOffersManager() {
               </div>
             ))}
             {festOffers.length === 0 && <p className="text-slate-400 text-sm">No active fest offers.</p>}
+            {festOffers.length > itemsPerPage && (
+              <Pagination
+                itemsPerPage={itemsPerPage}
+                totalItems={festOffers.length}
+                paginate={setCurrentPageOffers}
+                currentPage={currentPageOffers}
+              />
+            )}
           </div>
         </div>
 
@@ -194,7 +208,7 @@ function AdminOffersManager() {
 
           <div className="space-y-4">
             <h3 className="font-bold text-slate-700 dark:text-slate-300">Active Coupons</h3>
-            {coupons.map(c => (
+            {coupons.slice((currentPageCoupons - 1) * itemsPerPage, currentPageCoupons * itemsPerPage).map(c => (
               <div key={c.id} className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex justify-between items-center shadow-sm">
                 <div>
                   <h4 className="font-mono font-bold text-slate-800 dark:text-white tracking-wider">{c.code} <span className="font-sans text-xs bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full ml-2">{c.discount_percentage}% OFF</span></h4>
@@ -206,6 +220,14 @@ function AdminOffersManager() {
               </div>
             ))}
             {coupons.length === 0 && <p className="text-slate-400 text-sm">No active coupons.</p>}
+            {coupons.length > itemsPerPage && (
+              <Pagination
+                itemsPerPage={itemsPerPage}
+                totalItems={coupons.length}
+                paginate={setCurrentPageCoupons}
+                currentPage={currentPageCoupons}
+              />
+            )}
           </div>
         </div>
       </div>
